@@ -17,7 +17,8 @@ const OwnerDashboard = () => {
         location: '',
         price: '',
         property_type: 'BEDSITTER',
-        description: ''
+        description: '',
+        is_available: 'true'
     });
     const [formMessage, setFormMessage] = useState('');
 
@@ -71,6 +72,7 @@ const fetchData = useCallback(async () => {
         data.append('price', formData.price);
         data.append('property_type', formData.property_type);
         data.append('description', formData.description);
+        data.append('is_available', formData.is_available);
 
         // 2. Append multiple images
         selectedFiles.forEach((file) => {
@@ -85,12 +87,21 @@ const fetchData = useCallback(async () => {
             });
             setFormMessage('Property listed successfully!');
             // Reset form and files
-            setFormData({ title: '', location: '', price: '', property_type: 'BEDSITTER', description: '' });
+            setFormData({ title: '', location: '', price: '', property_type: 'BEDSITTER', description: '', is_available: 'true' });
             setSelectedFiles([]);
             fetchData(); 
         } catch (error) {
             console.error("Error adding property:", error.response?.data);
             setFormMessage('Failed to add property. Please check your inputs.');
+        }
+    };
+
+    const handleAvailabilityChange = async (propertyId, isAvailable) => {
+        try {
+            await api.patch(`properties/${propertyId}/`, { is_available: isAvailable });
+            fetchData();
+        } catch (error) {
+            console.error("Error updating property availability:", error.response?.data);
         }
     };
 
@@ -177,6 +188,14 @@ const fetchData = useCallback(async () => {
                     </div>
 
                     <div>
+                        <label>Availability</label>
+                        <select name="is_available" value={formData.is_available} onChange={handleInputChange}>
+                            <option value="true">Available</option>
+                            <option value="false">Not Available</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label>Upload Images (Max 5)</label>
                         <input
                             type="file"
@@ -206,8 +225,19 @@ const fetchData = useCallback(async () => {
                             <p className="property-meta">📍 {property.location}</p>
                             <p className="price">KES {Number(property.price).toLocaleString()}</p>
                             <span className={`status-pill ${property.is_available ? 'status-ok' : 'status-bad'}`}>
-                                {property.is_available ? 'Available' : 'Booked'}
+                                {property.is_available ? 'Available' : 'Not Available'}
                             </span>
+
+                            <div style={{ marginTop: '0.8rem' }}>
+                                <label style={{ marginBottom: '0.25rem' }}>Change Availability</label>
+                                <select
+                                    value={property.is_available ? 'true' : 'false'}
+                                    onChange={(e) => handleAvailabilityChange(property.id, e.target.value === 'true')}
+                                >
+                                    <option value="true">Available</option>
+                                    <option value="false">Not Available</option>
+                                </select>
+                            </div>
                         </article>
                     ))}
                 </div>

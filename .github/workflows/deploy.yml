@@ -1,0 +1,60 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main  # Trigger only when you push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # --- FRONTEND BUILD ---
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build React App
+        run: |
+          cd frontend  # Change to your React folder name
+          npm install
+          npm run build
+
+      # --- DEPLOY TO CPANEL ---
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # Local folder to upload -> Remote cPanel folder
+          local-dir: ./Frontend/dist/ 
+          server-dir: public_html/
+          # List files/folders to EXCLUDE from being overwritten
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            .htaccess
+
+      - name: Deploy Backend
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./Backend/
+          server-dir: django_backend/
+
+      # --- RESTART PYTHON APP ---
+      # This creates/updates the restart.txt file which cPanel watches
+      - name: Restart Python App
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: touch /home/${{ secrets.FTP_USERNAME }}/django_backend/tmp/restart.txt

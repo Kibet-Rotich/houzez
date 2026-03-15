@@ -3,66 +3,51 @@ name: Deploy Website
 on:
   push:
     branches:
-      - master  # Trigger only when you push to master
+      - master
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # --- FRONTEND BUILD ---
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Build React App
         run: |
-          cd Frontend/rental-frontend  # Change to your React folder name
+          cd Frontend/rental-frontend
           npm install
           npm run build
 
-      # --- DEPLOY TO CPANEL ---
-      - name: Deploy via FTP
+      # --- DEPLOY FRONTEND ---
+      - name: Deploy Frontend via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # Local folder to upload -> Remote cPanel folder
           local-dir: ./Frontend/rental-frontend/dist/ 
           server-dir: public_html/
-          # List files/folders to EXCLUDE from being overwritten
           exclude: |
-            **/.git*
-            **/node_modules/**
             .htaccess
 
-      - name: Deploy Backend
+      # --- DEPLOY BACKEND & RESTART ---
+      - name: Deploy Backend via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./Backend/
+          local-dir: ./backend/
           server-dir: django_backend/
-
+          # Ensure tmp/restart.txt is NOT excluded
           exclude: |
-            **/.git*
             **/venv/**
             **/__pycache__/**
-            .htaccess
-            db.sqlite3    
+            db.sqlite3
             media/
-
-      # --- RESTART PYTHON APP ---
-      # This creates/updates the restart.txt file which cPanel watches
-      - name: Restart Python App
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          script: touch /home/${{ secrets.FTP_USERNAME }}/django_backend/tmp/restart.txt

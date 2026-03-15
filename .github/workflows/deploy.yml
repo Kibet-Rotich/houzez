@@ -43,7 +43,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./backend/
+          local-dir: ./Backend/
           server-dir: django_backend/
           # Ensure tmp/restart.txt is NOT excluded
           exclude: |

@@ -301,6 +301,39 @@ h1 {
   margin-top: 0.65rem;
 }
 
+.listings-layout {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+.filter-sidebar {
+  padding: 1rem;
+  position: sticky;
+  top: 92px;
+}
+
+.filter-sidebar h3 {
+  margin: 0;
+}
+
+.filter-help {
+  margin: 0.45rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.filter-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.filter-actions .btn {
+  width: 100%;
+}
+
 .empty-state,
 .loading-state {
   text-align: center;
@@ -411,6 +444,14 @@ select:focus {
 }
 
 @media (max-width: 860px) {
+  .listings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-sidebar {
+    position: static;
+  }
+
   .grid-2,
   .footer-inner {
     grid-template-columns: 1fr;

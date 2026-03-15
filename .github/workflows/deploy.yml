@@ -3,7 +3,7 @@ name: Deploy Website
 on:
   push:
     branches:
-      - main  # Trigger only when you push to main
+      - master  # Trigger only when you push to master
 
 jobs:
   deploy:
@@ -48,6 +48,14 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./Backend/
           server-dir: django_backend/
+
+          exclude: |
+            **/.git*
+            **/venv/**
+            **/__pycache__/**
+            .htaccess
+            db.sqlite3    
+            media/
 
       # --- RESTART PYTHON APP ---
       # This creates/updates the restart.txt file which cPanel watches

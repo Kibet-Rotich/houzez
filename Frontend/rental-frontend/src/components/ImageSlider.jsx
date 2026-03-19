@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BASE_URL } from '../config';
 
 const ImageSlider = ({ images }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,7 +21,7 @@ const ImageSlider = ({ images }) => {
     const currentMedia = images[currentIndex];
     const mediaUrl = (currentMedia.url || currentMedia.image || '').startsWith('http')
         ? (currentMedia.url || currentMedia.image)
-        : `https://onegb.co.ke/backend/${currentMedia.url || currentMedia.image}`;
+        : `${BASE_URL}${currentMedia.url || currentMedia.image}`;
     const isVideo = currentMedia.media_type === 'VIDEO';
 
     return (

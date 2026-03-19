@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 // Create an Axios instance with your Django backend's base URL
+// Uses environment variable VITE_API_URL (see .env file)
 const api = axios.create({
-    baseURL: 'https://onegb.co.ke/backend/api/', // Change this to your actual backend URL
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
     headers: {
         'Content-Type': 'application/json',
     },

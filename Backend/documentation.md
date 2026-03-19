@@ -26,7 +26,11 @@ price (Decimal)
 
 property_type (Enum/Choices: 'BEDSITTER', '1_BDRM', '2_BDRM', 'HOUSE', etc.)
 
-is_available (Boolean, default: True)
+available_units (Positive Integer, default: 1)
+
+owner contact exposed in property API: owner_name, owner_email, owner_phone_number
+
+property media supports both photos and videos (max 15 files per property)
 
 created_at, updated_at (Timestamps)
 
@@ -63,7 +67,7 @@ Properties (Rentals)
 
 GET /api/properties/: List all properties. Unauthenticated access allowed.
 
-Query Params for Filtering: ?location=X&min_price=Y&max_price=Z&type=BEDSITTER
+Query Params for Filtering/Search: ?search=keyword&location=X&property_type=BEDSITTER&min_price=Y&max_price=Z&min_units=A&max_units=B
 
 GET /api/properties/<id>/: View details of a specific property.
 

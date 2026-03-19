@@ -61,7 +61,7 @@ const PropertyDetails = () => {
 
     return (
         <div style={{ maxWidth: '920px', margin: '0 auto', display: 'grid', gap: '1.25rem' }}>
-            <ImageSlider images={property.images} />
+            <ImageSlider images={property.media || property.images} />
 
             <section className="details-panel">
                 <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Property details</span>
@@ -71,9 +71,11 @@ const PropertyDetails = () => {
 
                 <div className="form-grid grid-2" style={{ marginTop: '1rem', background: 'var(--surface-soft)', borderRadius: '12px', padding: '1rem' }}>
                     <div><strong>Type:</strong> {property.property_type.replace('_', ' ')}</div>
-                    <div><strong>Status:</strong> {property.is_available ? 'Available' : 'Booked'}</div>
+                    <div><strong>Available Units:</strong> {property.available_units}</div>
                     <div><strong>Listed by:</strong> {property.owner_name}</div>
                     <div><strong>Listed on:</strong> {new Date(property.created_at).toLocaleDateString()}</div>
+                    <div><strong>Owner Email:</strong> {property.owner_email || 'Not provided'}</div>
+                    <div><strong>Owner Phone:</strong> {property.owner_phone_number || 'Not provided'}</div>
                 </div>
 
                 <h3 style={{ marginTop: '1.1rem' }}>Description</h3>
@@ -122,14 +124,14 @@ const PropertyDetails = () => {
 
                         <button
                             type="submit"
-                            disabled={!property.is_available}
+                            disabled={property.available_units <= 0}
                             className="btn btn-primary"
                             style={{
-                                opacity: property.is_available ? 1 : 0.65,
-                                cursor: property.is_available ? 'pointer' : 'not-allowed'
+                                opacity: property.available_units > 0 ? 1 : 0.65,
+                                cursor: property.available_units > 0 ? 'pointer' : 'not-allowed'
                             }}
                         >
-                            {property.is_available ? 'Submit Visit Request' : 'Currently Unavailable'}
+                            {property.available_units > 0 ? 'Submit Visit Request' : 'Currently Unavailable'}
                         </button>
                     </form>
                 )}

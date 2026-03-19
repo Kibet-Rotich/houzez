@@ -17,6 +17,12 @@ const ImageSlider = ({ images }) => {
         setCurrentIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1);
     };
 
+    const currentMedia = images[currentIndex];
+    const mediaUrl = (currentMedia.url || currentMedia.image || '').startsWith('http')
+        ? (currentMedia.url || currentMedia.image)
+        : `https://onegb.co.ke/backend/${currentMedia.url || currentMedia.image}`;
+    const isVideo = currentMedia.media_type === 'VIDEO';
+
     return (
         <div className="slider">
             {images.length > 1 && (
@@ -32,13 +38,11 @@ const ImageSlider = ({ images }) => {
                 </>
             )}
 
-            <img 
-                src={images[currentIndex].image.startsWith('http') 
-                    ? images[currentIndex].image 
-                    : `https://onegb.co.ke/backend/${images[currentIndex].image}`
-                } 
-                alt="Property" 
-            />
+            {isVideo ? (
+                <video src={mediaUrl} controls preload="metadata" className="slider-media" />
+            ) : (
+                <img src={mediaUrl} alt="Property" className="slider-media" />
+            )}
         </div>
     );
 };

@@ -10,6 +10,7 @@ const Register = () => {
         password: '',
         first_name: '',
         last_name: '',
+        phone_number: '',
         role: 'CUSTOMER' // Default role
     });
     const [error, setError] = useState('');
@@ -42,7 +43,7 @@ const Register = () => {
         <div className="auth-wrap">
             <div className="auth-card">
                 <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Join us</span>
-                <h2>Create your Houzez account</h2>
+                <h2>Create your OneGB account</h2>
 
                 {error && <p className="message error">{error}</p>}
 
@@ -71,6 +72,11 @@ const Register = () => {
                 <div>
                     <label>Password *</label>
                     <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+                </div>
+
+                <div>
+                    <label>Phone Number</label>
+                    <input type="text" name="phone_number" value={formData.phone_number} onChange={handleChange} placeholder="e.g., 0712345678" />
                 </div>
 
                 <div>

@@ -1,4 +1,6 @@
 # rentals/models.py
+import builtins
+
 from django.db import models
 from django.conf import settings
 
@@ -16,12 +18,16 @@ class Property(models.Model):
     location = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     property_type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
-    is_available = models.BooleanField(default=True)
+    available_units = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.title} - {self.location}"
+
+    @property
+    def is_available(self):
+        return self.available_units > 0
 
 class Booking(models.Model):
     STATUS_CHOICES = (
@@ -41,10 +47,25 @@ class Booking(models.Model):
         return f"Booking by {self.customer.username} for {self.property.title}"
     
 
-# rentals/models.py
 class PropertyImage(models.Model):
+    MEDIA_TYPE_CHOICES = (
+        ('IMAGE', 'Image'),
+        ('VIDEO', 'Video'),
+    )
+
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='property_images/')
+    image = models.ImageField(upload_to='property_images/', blank=True, null=True)
+    media_file = models.FileField(upload_to='property_media/', blank=True, null=True)
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES, default='IMAGE')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @builtins.property
+    def file_url(self):
+        if self.media_file:
+            return self.media_file.url
+        if self.image:
+            return self.image.url
+        return ''
 
     def __str__(self):
-        return f"Image for {self.property.title}"
+        return f"{self.media_type} for {self.property.title}"

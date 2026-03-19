@@ -1,21 +1,10 @@
 const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, loading }) => {
 	return (
 		<aside className="card filter-sidebar">
-			<h3>Filter Properties</h3>
+			<h3>Filter Listings</h3>
 			<p className="filter-help">Use all available API filters to narrow down listings.</p>
 
 			<div className="form-grid" style={{ marginTop: '0.85rem' }}>
-				<div>
-					<label htmlFor="search">Search</label>
-					<input
-						id="search"
-						name="search"
-						value={filters.search}
-						onChange={onFilterChange}
-						placeholder="Title, location or description"
-					/>
-				</div>
-
 				<div>
 					<label htmlFor="location">Location</label>
 					<input
@@ -44,7 +33,7 @@ const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, loading }) =
 				</div>
 
 				<div>
-					<label htmlFor="min_price">Min Price (KES)</label>
+					<label htmlFor="min_price">Min Rent (KES)</label>
 					<input
 						id="min_price"
 						name="min_price"
@@ -57,7 +46,7 @@ const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, loading }) =
 				</div>
 
 				<div>
-					<label htmlFor="max_price">Max Price (KES)</label>
+					<label htmlFor="max_price">Max Rent (KES)</label>
 					<input
 						id="max_price"
 						name="max_price"
@@ -70,17 +59,29 @@ const FilterSidebar = ({ filters, onFilterChange, onApply, onReset, loading }) =
 				</div>
 
 				<div>
-					<label htmlFor="is_available">Availability</label>
-					<select
-						id="is_available"
-						name="is_available"
-						value={filters.is_available}
+					<label htmlFor="min_units">Min Available Units</label>
+					<input
+						id="min_units"
+						name="min_units"
+						type="number"
+						min="0"
+						value={filters.min_units}
 						onChange={onFilterChange}
-					>
-						<option value="">All</option>
-						<option value="true">Available</option>
-						<option value="false">Unavailable</option>
-					</select>
+						placeholder="e.g., 1"
+					/>
+				</div>
+
+				<div>
+					<label htmlFor="max_units">Max Available Units</label>
+					<input
+						id="max_units"
+						name="max_units"
+						type="number"
+						min="0"
+						value={filters.max_units}
+						onChange={onFilterChange}
+						placeholder="e.g., 5"
+					/>
 				</div>
 
 				<div className="filter-actions">

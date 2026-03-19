@@ -29,7 +29,7 @@ const Login = () => {
         <div className="auth-wrap">
             <div className="auth-card">
                 <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Welcome back</span>
-                <h2>Sign in to Houzez</h2>
+                <h2>Sign in to OneGB</h2>
 
                 {error && <p className="message error">{error}</p>}
 

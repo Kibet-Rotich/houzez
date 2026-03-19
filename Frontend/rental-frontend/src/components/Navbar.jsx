@@ -15,7 +15,7 @@ const Navbar = () => {
         <header className="site-header">
             <nav className="site-header-inner">
                 <Link to="/" className="brand-word" style={{ fontSize: '1.8rem', color: 'var(--primary)' }}>
-                    Houzez
+                    OneGB
                 </Link>
 
                 <div className="nav-links">

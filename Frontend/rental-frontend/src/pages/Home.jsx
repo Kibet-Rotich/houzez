@@ -10,17 +10,19 @@ const Home = () => {
         search: '',
         location: '',
         property_type: '',
-        is_available: '',
         min_price: '',
-        max_price: ''
+        max_price: '',
+        min_units: '',
+        max_units: ''
     });
     const [appliedFilters, setAppliedFilters] = useState({
         search: '',
         location: '',
         property_type: '',
-        is_available: '',
         min_price: '',
-        max_price: ''
+        max_price: '',
+        min_units: '',
+        max_units: ''
     });
 
     useEffect(() => {
@@ -30,13 +32,11 @@ const Home = () => {
             const params = {};
             if (appliedFilters.search.trim()) params.search = appliedFilters.search.trim();
             if (appliedFilters.location.trim()) params.location = appliedFilters.location.trim();
-            if (appliedFilters.property_type) {
-                params.property_type = appliedFilters.property_type;
-                params.type = appliedFilters.property_type;
-            }
-            if (appliedFilters.is_available !== '') params.is_available = appliedFilters.is_available;
+            if (appliedFilters.property_type) params.property_type = appliedFilters.property_type;
             if (appliedFilters.min_price !== '') params.min_price = appliedFilters.min_price;
             if (appliedFilters.max_price !== '') params.max_price = appliedFilters.max_price;
+            if (appliedFilters.min_units !== '') params.min_units = appliedFilters.min_units;
+            if (appliedFilters.max_units !== '') params.max_units = appliedFilters.max_units;
 
             try {
                 const response = await api.get('properties/', { params });
@@ -56,6 +56,11 @@ const Home = () => {
         setFilters((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setAppliedFilters((prev) => ({ ...prev, search: filters.search }));
+    };
+
     const handleApplyFilters = () => {
         setAppliedFilters(filters);
     };
@@ -65,9 +70,10 @@ const Home = () => {
             search: '',
             location: '',
             property_type: '',
-            is_available: '',
             min_price: '',
-            max_price: ''
+            max_price: '',
+            min_units: '',
+            max_units: ''
         };
         setFilters(emptyFilters);
         setAppliedFilters(emptyFilters);
@@ -81,15 +87,15 @@ const Home = () => {
         <div>
             <section className="hero">
                 <div className="hero-inner">
-                    <span className="eyebrow">Find Your Dream Home</span>
-                    <h1>We help people buy, rent and sell homes</h1>
+                    <span className="eyebrow">Find Your Next Rental</span>
+                    <h1>OneGB helps you find rooms and houses to rent in Kenya</h1>
                     <p>
-                        Welcome to Houzez — browse curated homes, request visits with confidence,
-                        and manage every step from one place.
+                        Browse verified listings for students and workers moving around Kenya&apos;s cities,
+                        request visits, and connect with owners in one place.
                     </p>
                     <div className="hero-actions">
                         <a href="#available-homes"><button className="btn btn-accent">Explore Listings</button></a>
-                        <button className="btn btn-outline">Dubai • Abu Dhabi • Sharjah • Ajman</button>
+                        <button className="btn btn-outline">Nairobi • Kiambu • Eldoret • Mombasa</button>
                     </div>
                 </div>
             </section>
@@ -98,23 +104,23 @@ const Home = () => {
                 <div className="section-head">
                     <div>
                         <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Our Values</span>
-                        <h2>Family built, with heart.</h2>
+                        <h2>Local rentals made simple.</h2>
                     </div>
-                    <p>Inspired by tradition and focused on quality, we make the search and move experience simpler.</p>
+                    <p>We focus on practical rental needs: budget clarity, location accuracy, and direct owner communication.</p>
                 </div>
 
                 <div className="grid grid-3">
                     <article className="card feature-card">
-                        <h3>Qualified Agents</h3>
-                        <p>Guidance you can trust from first inquiry to final move-in.</p>
+                        <h3>Verified Listings</h3>
+                        <p>Clear details on rent, location, and unit availability before you plan a visit.</p>
                     </article>
                     <article className="card feature-card">
-                        <h3>Excellent Service</h3>
-                        <p>Clear communication and fast updates throughout your journey.</p>
+                        <h3>Fast Search</h3>
+                        <p>Search by house name, estate, town, or keywords that matter to your move.</p>
                     </article>
                     <article className="card feature-card">
-                        <h3>Customer Care</h3>
-                        <p>Support that keeps tomorrow in mind and today in focus.</p>
+                        <h3>Direct Contact</h3>
+                        <p>See owner contact details so you can follow up quickly after finding a suitable unit.</p>
                     </article>
                 </div>
             </section>
@@ -123,10 +129,21 @@ const Home = () => {
                 <div className="section-head">
                     <div>
                         <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Featured Homes</span>
-                        <h2>Our new homes for sale and rent</h2>
+                        <h2>Available rental listings</h2>
                     </div>
-                    <p>Search homes in your local area by location, amenities, and budget.</p>
+                    <p>Use search and filters to narrow by location, rent budget, and available units.</p>
                 </div>
+
+                <form className="search-bar" onSubmit={handleSearchSubmit}>
+                    <input
+                        type="text"
+                        name="search"
+                        value={filters.search}
+                        onChange={handleFilterChange}
+                        placeholder="Search by title, location, estate, or any keyword"
+                    />
+                    <button type="submit" className="btn btn-primary">Search</button>
+                </form>
 
                 <div className="listings-layout">
                     <FilterSidebar

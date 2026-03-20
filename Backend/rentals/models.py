@@ -16,6 +16,7 @@ class Property(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     location = models.CharField(max_length=100)
+    google_maps_url = models.URLField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     property_type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
     available_units = models.PositiveIntegerField(default=1)

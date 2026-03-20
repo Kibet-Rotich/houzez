@@ -83,6 +83,27 @@ a {
   color: var(--muted);
 }
 
+.directions-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.directions-link:hover {
+  color: #112540;
+}
+
+.directions-link:focus-visible {
+  outline: 2px solid rgba(24, 49, 83, 0.35);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .btn {
   border: 1px solid transparent;
   border-radius: 999px;

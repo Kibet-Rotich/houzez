@@ -1,5 +1,6 @@
 # rentals/serializers.py
 import os
+from urllib.parse import quote_plus
 
 from rest_framework import serializers
 
@@ -31,6 +32,7 @@ class PropertySerializer(serializers.ModelSerializer):
     owner_first_name = serializers.ReadOnlyField(source='owner.first_name')
     owner_last_name = serializers.ReadOnlyField(source='owner.last_name')
     is_available = serializers.SerializerMethodField()
+    directions_url = serializers.SerializerMethodField()
 
     uploaded_media = serializers.ListField(
         child=serializers.FileField(max_length=10000000, allow_empty_file=False, use_url=False),
@@ -54,6 +56,16 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def get_is_available(self, obj):
         return obj.available_units > 0
+
+    def get_directions_url(self, obj):
+        if obj.google_maps_url:
+            return obj.google_maps_url
+
+        if not obj.location:
+            return ''
+
+        query = quote_plus(obj.location)
+        return f'https://www.google.com/maps/search/?api=1&query={query}'
 
     def validate(self, attrs):
         media_files = attrs.get('uploaded_media', [])

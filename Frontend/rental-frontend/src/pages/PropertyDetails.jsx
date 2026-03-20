@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import AuthContext from '../context/AuthContext';
 import ImageSlider from '../components/ImageSlider';
+import { getDirectionsUrl } from '../utils/maps';
 
 const PropertyDetails = () => {
     const { id } = useParams(); // Grabs the ID from the URL
@@ -59,6 +60,8 @@ const PropertyDetails = () => {
     if (loading) return <div className="loading-state">Loading property details...</div>;
     if (!property) return <div className="empty-state">Property not found.</div>;
 
+    const directionsUrl = getDirectionsUrl(property);
+
     return (
         <div style={{ maxWidth: '920px', margin: '0 auto', display: 'grid', gap: '1.25rem' }}>
             <ImageSlider images={property.media || property.images} />
@@ -67,6 +70,13 @@ const PropertyDetails = () => {
                 <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Property details</span>
                 <h2 style={{ marginTop: '0.5rem' }}>{property.title}</h2>
                 <p className="property-meta" style={{ marginTop: '0.45rem' }}>📍 {property.location}</p>
+                {directionsUrl && (
+                    <p style={{ marginTop: '0.3rem' }}>
+                        <a href={directionsUrl} target="_blank" rel="noopener noreferrer" className="directions-link">
+                            Open in Google Maps
+                        </a>
+                    </p>
+                )}
                 <p className="price">KES {Number(property.price).toLocaleString()} / month</p>
 
                 <div className="form-grid grid-2" style={{ marginTop: '1rem', background: 'var(--surface-soft)', borderRadius: '12px', padding: '1rem' }}>

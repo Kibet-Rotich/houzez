@@ -5,6 +5,7 @@ import AuthContext from '../context/AuthContext';
 const emptyForm = {
     title: '',
     location: '',
+    google_maps_url: '',
     price: '',
     property_type: 'BEDSITTER',
     description: '',
@@ -70,6 +71,7 @@ const OwnerDashboard = () => {
         const data = new FormData();
         data.append('title', formData.title);
         data.append('location', formData.location);
+        data.append('google_maps_url', formData.google_maps_url);
         data.append('price', formData.price);
         data.append('property_type', formData.property_type);
         data.append('description', formData.description);
@@ -101,6 +103,7 @@ const OwnerDashboard = () => {
         setEditFormData({
             title: property.title,
             location: property.location,
+            google_maps_url: property.google_maps_url || '',
             price: property.price,
             property_type: property.property_type,
             description: property.description,
@@ -139,6 +142,7 @@ const OwnerDashboard = () => {
         const data = new FormData();
         data.append('title', editFormData.title);
         data.append('location', editFormData.location);
+        data.append('google_maps_url', editFormData.google_maps_url);
         data.append('price', editFormData.price);
         data.append('property_type', editFormData.property_type);
         data.append('description', editFormData.description);
@@ -243,6 +247,17 @@ const OwnerDashboard = () => {
                     </div>
 
                     <div>
+                        <label>Google Maps Link (Optional)</label>
+                        <input
+                            type="url"
+                            name="google_maps_url"
+                            value={formData.google_maps_url}
+                            onChange={handleInputChange}
+                            placeholder="https://maps.google.com/?q=-1.095,37.012"
+                        />
+                    </div>
+
+                    <div>
                         <label>Monthly Rent (KES)</label>
                         <input type="number" min="0" name="price" value={formData.price} onChange={handleInputChange} required />
                     </div>
@@ -306,6 +321,16 @@ const OwnerDashboard = () => {
                                     <div>
                                         <label>Location</label>
                                         <input name="location" value={editFormData.location} onChange={handleEditInputChange} required />
+                                    </div>
+                                    <div>
+                                        <label>Google Maps Link (Optional)</label>
+                                        <input
+                                            type="url"
+                                            name="google_maps_url"
+                                            value={editFormData.google_maps_url}
+                                            onChange={handleEditInputChange}
+                                            placeholder="https://maps.google.com/?q=-1.095,37.012"
+                                        />
                                     </div>
                                     <div>
                                         <label>Monthly Rent (KES)</label>

@@ -37,6 +37,7 @@ class PropertyApiTests(APITestCase):
             title='Kasarani One Bedroom',
             description='Quiet court near stage',
             location='Kasarani',
+            google_maps_url='https://maps.google.com/?q=-1.228,36.896',
             price=22000,
             property_type='1_BDRM',
             available_units=0,
@@ -71,3 +72,18 @@ class PropertyApiTests(APITestCase):
             format='json',
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_property_includes_directions_url_fallback(self):
+        response = self.client.get('/api/properties/', {'search': 'juja'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data.get('results', response.data)  # type: ignore[attr-defined]
+        self.assertEqual(len(data), 1)
+        self.assertIn('directions_url', data[0])
+        self.assertTrue(data[0]['directions_url'].startswith('https://www.google.com/maps/search/'))
+
+    def test_property_prefers_owner_supplied_google_maps_url(self):
+        response = self.client.get('/api/properties/', {'search': 'kasarani'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.data.get('results', response.data)  # type: ignore[attr-defined]
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['directions_url'], 'https://maps.google.com/?q=-1.228,36.896')

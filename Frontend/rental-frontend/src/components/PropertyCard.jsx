@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import ImageSlider from './ImageSlider';
+import { getDirectionsUrl } from '../utils/maps';
 
 const prettyType = (rawType = '') => rawType.replace('_', ' ');
 
 const PropertyCard = ({ property }) => {
+	const directionsUrl = getDirectionsUrl(property);
+
 	return (
 		<article className="card property-card">
 			<ImageSlider images={property.media || property.images} />
@@ -18,6 +21,18 @@ const PropertyCard = ({ property }) => {
 						? `${property.available_units} unit${property.available_units === 1 ? '' : 's'} available`
 						: 'No units available'}
 				</span>
+
+				{directionsUrl && (
+					<a
+						href={directionsUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="directions-link"
+						style={{ marginTop: '0.65rem' }}
+					>
+						Get Directions on Google Maps
+					</a>
+				)}
 
 				<Link to={`/property/${property.id}`} style={{ display: 'block', marginTop: '0.95rem' }}>
 					<button className="btn btn-primary" style={{ width: '100%' }}>

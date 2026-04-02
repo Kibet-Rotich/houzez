@@ -1,0 +1,28 @@
+Unauthorized: /backend/api/auth/login/
+Unauthorized: /backend/api/auth/login/
+Unauthorized: /backend/api/auth/login/
+Unauthorized: /backend/api/auth/login/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Bad Request: /backend/api/auth/register/
+Unauthorized: /backend/api/properties/
+Unauthorized: /backend/api/properties/
+Unauthorized: /backend/api/properties/
+Unauthorized: /backend/api/properties/
+[UID:1928][1259508] packetLen < 0
+Unauthorized: /backend/api/properties/
+[UID:1928][1259508] packetLen < 0
+Unauthorized: /backend/api/properties/
+[UID:1928][1259508] packetLen < 0
+Unauthorized: /backend/api/properties/
+[UID:1928][1259508] packetLen < 0
+Unauthorized: /backend/api/properties/
+[UID:1928][2632501] packetLen < 0
+Unauthorized: /backend/api/properties/
+[fpovvdhc@sbg106 django_backend]$ 

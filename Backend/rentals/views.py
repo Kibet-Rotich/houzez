@@ -1,3 +1,5 @@
+import logging
+
 from django_filters import rest_framework as django_filters
 from rest_framework import viewsets, permissions, filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -5,18 +7,40 @@ from .models import Property, Booking
 from .serializers import PropertySerializer, BookingSerializer
 
 
+logger = logging.getLogger('rentals')
+
+
 class IsOwnerWriteOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
             return True
         if not request.user or not request.user.is_authenticated:
+            logger.warning('Permission denied: unauthenticated write attempt method=%s path=%s', request.method, request.path)
             return False
-        return getattr(request.user, 'role', '') == 'OWNER'
+        is_owner = getattr(request.user, 'role', '') == 'OWNER'
+        if not is_owner:
+            logger.warning(
+                'Permission denied: non-owner write attempt user_id=%s role=%s method=%s path=%s',
+                request.user.id,
+                getattr(request.user, 'role', ''),
+                request.method,
+                request.path,
+            )
+        return is_owner
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return bool(request.user and request.user.is_authenticated and obj.owner_id == request.user.id)
+        allowed = bool(request.user and request.user.is_authenticated and obj.owner_id == request.user.id)
+        if not allowed:
+            logger.warning(
+                'Permission denied: owner mismatch user_id=%s owner_id=%s method=%s path=%s',
+                getattr(request.user, 'id', 'anonymous'),
+                obj.owner_id,
+                request.method,
+                request.path,
+            )
+        return allowed
 
 
 class PropertyFilterSet(django_filters.FilterSet):
@@ -43,7 +67,34 @@ class PropertyViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # Automatically assign the logged-in user as the owner of the property
-        serializer.save(owner=self.request.user)
+        property_obj = serializer.save(owner=self.request.user)
+        logger.info(
+            'Property created property_id=%s owner_id=%s title=%s',
+            property_obj.id,
+            self.request.user.id,
+            property_obj.title,
+        )
+
+    def perform_update(self, serializer):
+        property_obj = serializer.save()
+        logger.info(
+            'Property updated property_id=%s owner_id=%s title=%s',
+            property_obj.id,
+            self.request.user.id,
+            property_obj.title,
+        )
+
+    def perform_destroy(self, instance):
+        property_id = instance.id
+        owner_id = instance.owner_id
+        title = instance.title
+        super().perform_destroy(instance)
+        logger.info(
+            'Property deleted property_id=%s owner_id=%s title=%s',
+            property_id,
+            owner_id,
+            title,
+        )
 
 
 class BookingViewSet(viewsets.ModelViewSet):
@@ -58,9 +109,30 @@ class BookingViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         if getattr(user, 'role', '') == 'OWNER':
-            return Booking.objects.filter(property__owner=user)
-        return Booking.objects.filter(customer=user)
+            queryset = Booking.objects.filter(property__owner=user)
+            logger.info('Owner booking query user_id=%s', user.id)
+            return queryset
+        queryset = Booking.objects.filter(customer=user)
+        logger.info('Customer booking query user_id=%s', user.id)
+        return queryset
 
     def perform_create(self, serializer):
         # Automatically assign the logged-in user as the customer making the booking
-        serializer.save(customer=self.request.user)
+        booking = serializer.save(customer=self.request.user)
+        logger.info(
+            'Booking created booking_id=%s property_id=%s customer_id=%s scheduled_date=%s',
+            booking.id,
+            booking.property_id,
+            booking.customer_id,
+            booking.scheduled_date,
+        )
+
+    def perform_update(self, serializer):
+        booking = serializer.save()
+        logger.info(
+            'Booking updated booking_id=%s property_id=%s customer_id=%s status=%s',
+            booking.id,
+            booking.property_id,
+            booking.customer_id,
+            booking.status,
+        )

@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import api from '../services/api';
 import AuthContext from '../context/AuthContext';
+import { buildGoogleMapsPinUrl, buildGoogleMapsSearchUrl } from '../utils/maps';
 
 const emptyForm = {
     title: '',
@@ -51,6 +52,31 @@ const OwnerDashboard = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleUseCurrentLocation = () => {
+        setFormMessage('');
+        if (!navigator.geolocation) {
+            setFormMessage('Geolocation is not available on this browser. Please paste a Google Maps pin link manually.');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const mapsUrl = buildGoogleMapsPinUrl(position.coords.latitude, position.coords.longitude);
+                setFormData((prev) => ({ ...prev, google_maps_url: mapsUrl }));
+                setFormMessage('Current location captured and Google Maps pin link added.');
+            },
+            () => {
+                setFormMessage('Could not access your location. You can add the link manually or open Google Maps.');
+            },
+            { enableHighAccuracy: true, timeout: 10000 },
+        );
+    };
+
+    const openGoogleMapsForCreateForm = () => {
+        const url = buildGoogleMapsSearchUrl(formData.location);
+        window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     const handleFileChange = (e) => {
@@ -121,6 +147,31 @@ const OwnerDashboard = () => {
     const handleEditInputChange = (e) => {
         const { name, value } = e.target;
         setEditFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleUseCurrentLocationForEdit = () => {
+        setEditMessage('');
+        if (!navigator.geolocation) {
+            setEditMessage('Geolocation is not available on this browser. Please paste a Google Maps pin link manually.');
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const mapsUrl = buildGoogleMapsPinUrl(position.coords.latitude, position.coords.longitude);
+                setEditFormData((prev) => ({ ...prev, google_maps_url: mapsUrl }));
+                setEditMessage('Current location captured and Google Maps pin link added.');
+            },
+            () => {
+                setEditMessage('Could not access your location. You can add the link manually or open Google Maps.');
+            },
+            { enableHighAccuracy: true, timeout: 10000 },
+        );
+    };
+
+    const openGoogleMapsForEditForm = () => {
+        const url = buildGoogleMapsSearchUrl(editFormData.location);
+        window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     const handleEditFileChange = (e) => {
@@ -247,14 +298,23 @@ const OwnerDashboard = () => {
                     </div>
 
                     <div>
-                        <label>Google Maps Link (Optional)</label>
+                        <label>Google Maps Pin Link *</label>
                         <input
                             type="url"
                             name="google_maps_url"
                             value={formData.google_maps_url}
                             onChange={handleInputChange}
                             placeholder="https://maps.google.com/?q=-1.095,37.012"
+                            required
                         />
+                        <div style={{ marginTop: '0.45rem', display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                            <button type="button" className="btn btn-outline" onClick={handleUseCurrentLocation}>
+                                Use My Current Location
+                            </button>
+                            <button type="button" className="btn btn-outline" onClick={openGoogleMapsForCreateForm}>
+                                Open Google Maps
+                            </button>
+                        </div>
                     </div>
 
                     <div>
@@ -323,14 +383,23 @@ const OwnerDashboard = () => {
                                         <input name="location" value={editFormData.location} onChange={handleEditInputChange} required />
                                     </div>
                                     <div>
-                                        <label>Google Maps Link (Optional)</label>
+                                        <label>Google Maps Pin Link *</label>
                                         <input
                                             type="url"
                                             name="google_maps_url"
                                             value={editFormData.google_maps_url}
                                             onChange={handleEditInputChange}
                                             placeholder="https://maps.google.com/?q=-1.095,37.012"
+                                            required
                                         />
+                                        <div style={{ marginTop: '0.45rem', display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                                            <button type="button" className="btn btn-outline" onClick={handleUseCurrentLocationForEdit}>
+                                                Use My Current Location
+                                            </button>
+                                            <button type="button" className="btn btn-outline" onClick={openGoogleMapsForEditForm}>
+                                                Open Google Maps
+                                            </button>
+                                        </div>
                                     </div>
                                     <div>
                                         <label>Monthly Rent (KES)</label>

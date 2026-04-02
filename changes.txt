@@ -1,21 +1,6 @@
-Houzez icon
-Name change (OneGB)
-add photos and videos to house details
-edit house information and delete houses
-availability in terms of units.
-contact info
-increase number of images to 15
-
-
-
 google maps link mandatory
-when inputing link add "add location" option or open google maps directly
-migrate database
+when inputing link use current location to  add "add location" option or open google maps directly if possible
+change aspect ration of images shown when user clicks view details
+add logging
 
 
-git remote set-url origin https://ayioka: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@github.com/ayioka/linear_regression_model.git
-https://github.com/ayioka/linear_regression_model.git
-
-
-
-provide a publicly available api endpoint

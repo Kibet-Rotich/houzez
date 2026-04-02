@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { BASE_URL } from '../config';
 
-const ImageSlider = ({ images }) => {
+const ImageSlider = ({ images, className = '' }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     if (!images || images.length === 0) {
-        return <div className="slider" style={{ display: 'grid', placeItems: 'center', color: 'var(--muted)' }}>No Images</div>;
+        return <div className={`slider ${className}`.trim()} style={{ display: 'grid', placeItems: 'center', color: 'var(--muted)' }}>No Images</div>;
     }
 
     const goToPrevious = (e) => {
@@ -25,7 +25,7 @@ const ImageSlider = ({ images }) => {
     const isVideo = currentMedia.media_type === 'VIDEO';
 
     return (
-        <div className="slider">
+        <div className={`slider ${className}`.trim()}>
             {images.length > 1 && (
                 <>
                     <button className="slider-arrow left" onClick={goToPrevious}>❮</button>

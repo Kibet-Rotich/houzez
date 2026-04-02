@@ -64,7 +64,7 @@ const PropertyDetails = () => {
 
     return (
         <div style={{ maxWidth: '920px', margin: '0 auto', display: 'grid', gap: '1.25rem' }}>
-            <ImageSlider images={property.media || property.images} />
+            <ImageSlider images={property.media || property.images} className="slider-details" />
 
             <section className="details-panel">
                 <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Property details</span>

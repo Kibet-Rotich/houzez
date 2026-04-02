@@ -1,6 +1,6 @@
 # rentals/serializers.py
 import os
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 
 from rest_framework import serializers
 
@@ -68,6 +68,23 @@ class PropertySerializer(serializers.ModelSerializer):
         return f'https://www.google.com/maps/search/?api=1&query={query}'
 
     def validate(self, attrs):
+        maps_url = attrs.get('google_maps_url')
+        if maps_url is None and self.instance:
+            maps_url = self.instance.google_maps_url
+
+        maps_url = (maps_url or '').strip()
+        if not maps_url:
+            raise serializers.ValidationError({
+                'google_maps_url': 'Google Maps pin link is required. Use the "Use my location" option to auto-fill it.',
+            })
+
+        if not self._is_google_maps_link(maps_url):
+            raise serializers.ValidationError({
+                'google_maps_url': 'Please provide a valid Google Maps link (maps.google.com, google.com/maps, g.co/maps, or maps.app.goo.gl).',
+            })
+
+        attrs['google_maps_url'] = maps_url
+
         media_files = attrs.get('uploaded_media', [])
         legacy_files = attrs.get('uploaded_images', [])
         all_files = [*media_files, *legacy_files]
@@ -94,6 +111,17 @@ class PropertySerializer(serializers.ModelSerializer):
         if content_type.startswith('video/') or ext in {'.mp4', '.mov', '.avi', '.mkv', '.webm'}:
             return 'VIDEO'
         raise serializers.ValidationError(f'Unsupported media type for file: {upload.name}')
+
+    def _is_google_maps_link(self, url):
+        parsed = urlparse(url)
+        host = parsed.netloc.lower()
+        return host in {
+            'maps.google.com',
+            'www.google.com',
+            'google.com',
+            'g.co',
+            'maps.app.goo.gl',
+        }
 
     def _save_media(self, property_obj, uploads):
         for upload in uploads:

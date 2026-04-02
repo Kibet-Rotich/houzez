@@ -19,6 +19,8 @@ jobs:
           node-version: 22
 
       - name: Build React App
+        env:
+          VITE_API_URL: https://onegb.co.ke/backend/api
         run: |
           cd Frontend/rental-frontend
           npm install

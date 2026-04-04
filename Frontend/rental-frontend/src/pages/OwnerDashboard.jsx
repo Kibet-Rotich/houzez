@@ -13,11 +13,14 @@ const emptyForm = {
     available_units: 1,
 };
 
-const OwnerDashboard = () => {
+const OwnerDashboard = ({ scope = 'owner' }) => {
     const { user } = useContext(AuthContext);
+    const isStaffPortal = scope === 'staff';
     const [properties, setProperties] = useState([]);
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [portalStats, setPortalStats] = useState(null);
+    const [recentProperties, setRecentProperties] = useState([]);
 
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [formData, setFormData] = useState(emptyForm);
@@ -33,17 +36,26 @@ const OwnerDashboard = () => {
         try {
             const propRes = await api.get('properties/');
             const allProps = propRes.data.results || propRes.data;
-            const myProps = allProps.filter((p) => String(p.owner) === String(user.user_id));
-            setProperties(myProps);
+            const visibleProps = isStaffPortal ? allProps : allProps.filter((p) => String(p.owner) === String(user.user_id));
+            setProperties(visibleProps);
 
-            const bookRes = await api.get('bookings/');
-            setBookings(bookRes.data.results || bookRes.data);
+            if (isStaffPortal) {
+                const portalRes = await api.get('staff-portal/');
+                setPortalStats(portalRes.data.stats || null);
+                setRecentProperties(portalRes.data.recent_properties || []);
+                setBookings([]);
+            } else {
+                const bookRes = await api.get('bookings/');
+                setBookings(bookRes.data.results || bookRes.data);
+                setPortalStats(null);
+                setRecentProperties([]);
+            }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
         } finally {
             setLoading(false);
         }
-    }, [user.user_id]);
+    }, [isStaffPortal, user.user_id]);
 
     useEffect(() => {
         fetchData();
@@ -244,42 +256,65 @@ const OwnerDashboard = () => {
     return (
         <div style={{ display: 'grid', gap: '1.2rem' }}>
             <section className="dashboard-panel">
-                <span className="eyebrow" style={{ color: 'var(--secondary)' }}>Owner dashboard</span>
+                <span className="eyebrow" style={{ color: 'var(--secondary)' }}>{isStaffPortal ? 'Staff portal' : 'Owner dashboard'}</span>
                 <div style={{ marginTop: '0.45rem' }}>
-                    <h2>Manage Your Listings</h2>
-                    <p style={{ color: 'var(--muted)' }}>Create listings, update full details, manage media, and review visit requests.</p>
+                    <h2>{isStaffPortal ? 'Manage every listing' : 'Manage Your Listings'}</h2>
+                    <p style={{ color: 'var(--muted)' }}>
+                        {isStaffPortal
+                            ? 'Create listings, update any house, upload media, and remove stale properties across the platform.'
+                            : 'Create listings, update full details, manage media, and review visit requests.'}
+                    </p>
                 </div>
             </section>
 
-            <section className="dashboard-panel">
-                <h3>Pending Visit Requests</h3>
-                {bookings.filter((b) => b.status === 'PENDING').length === 0 ? (
-                    <p style={{ color: 'var(--muted)', fontStyle: 'italic' }}>No pending requests right now.</p>
-                ) : (
-                    <div className="grid" style={{ marginTop: '0.85rem' }}>
-                        {bookings.filter((b) => b.status === 'PENDING').map((booking) => (
-                            <article key={booking.id} className="card" style={{ padding: '1rem' }}>
-                                <h4>{booking.property_title}</h4>
-                                <p className="property-meta"><strong>Requested by:</strong> {booking.customer_name}</p>
-                                <p className="property-meta"><strong>Date & Time:</strong> {new Date(booking.scheduled_date).toLocaleString()}</p>
-                                {booking.notes && <p style={{ marginTop: '0.55rem', fontStyle: 'italic', color: 'var(--muted)' }}>"{booking.notes}"</p>}
+            {isStaffPortal && portalStats && (
+                <section className="grid grid-3">
+                    <article className="dashboard-panel">
+                        <h3>{portalStats.total_properties}</h3>
+                        <p className="property-meta">Total properties</p>
+                    </article>
+                    <article className="dashboard-panel">
+                        <h3>{portalStats.available_properties}</h3>
+                        <p className="property-meta">Available properties</p>
+                    </article>
+                    <article className="dashboard-panel">
+                        <h3>{portalStats.pending_bookings}</h3>
+                        <p className="property-meta">Pending bookings</p>
+                    </article>
+                </section>
+            )}
 
-                                <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                                    <button onClick={() => handleBookingAction(booking.id, 'CONFIRMED')} className="btn btn-primary">
-                                        Accept
-                                    </button>
-                                    <button onClick={() => handleBookingAction(booking.id, 'CANCELLED')} className="btn btn-outline">
-                                        Decline
-                                    </button>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
-                )}
-            </section>
+            {!isStaffPortal && (
+                <section className="dashboard-panel">
+                    <h3>Pending Visit Requests</h3>
+                    {bookings.filter((b) => b.status === 'PENDING').length === 0 ? (
+                        <p style={{ color: 'var(--muted)', fontStyle: 'italic' }}>No pending requests right now.</p>
+                    ) : (
+                        <div className="grid" style={{ marginTop: '0.85rem' }}>
+                            {bookings.filter((b) => b.status === 'PENDING').map((booking) => (
+                                <article key={booking.id} className="card" style={{ padding: '1rem' }}>
+                                    <h4>{booking.property_title}</h4>
+                                    <p className="property-meta"><strong>Requested by:</strong> {booking.customer_name}</p>
+                                    <p className="property-meta"><strong>Date & Time:</strong> {new Date(booking.scheduled_date).toLocaleString()}</p>
+                                    {booking.notes && <p style={{ marginTop: '0.55rem', fontStyle: 'italic', color: 'var(--muted)' }}>{booking.notes}</p>}
+
+                                    <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+                                        <button onClick={() => handleBookingAction(booking.id, 'CONFIRMED')} className="btn btn-primary">
+                                            Accept
+                                        </button>
+                                        <button onClick={() => handleBookingAction(booking.id, 'CANCELLED')} className="btn btn-outline">
+                                            Decline
+                                        </button>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            )}
 
             <section className="dashboard-panel">
-                <h3>List a New Property</h3>
+                <h3>{isStaffPortal ? 'Add a New Property' : 'List a New Property'}</h3>
                 {formMessage && (
                     <p className={`message ${formMessage.includes('successfully') ? 'success' : 'error'}`} style={{ marginTop: '0.7rem' }}>
                         {formMessage}
@@ -354,8 +389,22 @@ const OwnerDashboard = () => {
             </section>
 
             <section className="dashboard-panel">
-                <h3>My Listed Properties</h3>
+                <h3>{isStaffPortal ? 'All Listed Properties' : 'My Listed Properties'}</h3>
                 {editMessage && <p className="message error" style={{ marginTop: '0.75rem' }}>{editMessage}</p>}
+
+                {isStaffPortal && recentProperties.length > 0 && (
+                    <div style={{ marginTop: '0.75rem' }}>
+                        <p className="property-meta" style={{ marginBottom: '0.5rem' }}>Recently updated listings</p>
+                        <div className="grid grid-3">
+                            {recentProperties.slice(0, 3).map((property) => (
+                                <article key={property.id} className="card" style={{ padding: '1rem' }}>
+                                    <h4>{property.title}</h4>
+                                    <p className="property-meta">{property.location}</p>
+                                </article>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-3" style={{ marginTop: '0.85rem' }}>
                     {properties.map((property) => (

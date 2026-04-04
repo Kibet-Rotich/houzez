@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BASE_URL } from '../config';
 
-const ImageSlider = ({ images, className = '' }) => {
+const ImageSlider = ({ images, className = '', onMediaClick }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     if (!images || images.length === 0) {
@@ -40,9 +40,20 @@ const ImageSlider = ({ images, className = '' }) => {
             )}
 
             {isVideo ? (
-                <video src={mediaUrl} controls preload="metadata" className="slider-media" />
+                <video
+                    src={mediaUrl}
+                    controls
+                    preload="metadata"
+                    className={`slider-media ${onMediaClick ? 'slider-media-clickable' : ''}`.trim()}
+                    onClick={onMediaClick}
+                />
             ) : (
-                <img src={mediaUrl} alt="Property" className="slider-media" />
+                <img
+                    src={mediaUrl}
+                    alt="Property"
+                    className={`slider-media ${onMediaClick ? 'slider-media-clickable' : ''}`.trim()}
+                    onClick={onMediaClick}
+                />
             )}
         </div>
     );

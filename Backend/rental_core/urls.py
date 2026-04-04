@@ -25,4 +25,6 @@ urlpatterns = [
     path('api/auth/', include('accounts.urls')),
     # Route all rental/booking requests to the rentals app
     path('api/', include('rentals.urls')), 
+    # Staff-only portal routes
+    path('api/', include('dashboard.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -30,6 +30,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         token['role'] = user.role
         token['email'] = user.email
+        token['is_staff'] = user.is_staff
 
         return token
 
@@ -38,4 +39,5 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Keep these for easy access on the frontend without decoding
         data['role'] = self.user.role # type: ignore
         data['username'] = self.user.username # type: ignore
+        data['is_staff'] = self.user.is_staff # type: ignore
         return data

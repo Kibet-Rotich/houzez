@@ -15,6 +15,7 @@ import Register from './pages/Register';
 // Protected Pages
 import CustomerDashboard from './pages/CustomerDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
+import StaffDashboard from './pages/StaffDashboard';
 
 function App() {
     return (
@@ -42,6 +43,14 @@ function App() {
                             element={
                                 <ProtectedRoute allowedRole="OWNER">
                                     <OwnerDashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/dashboard/staff"
+                            element={
+                                <ProtectedRoute requireStaff>
+                                    <StaffDashboard />
                                 </ProtectedRoute>
                             }
                         />

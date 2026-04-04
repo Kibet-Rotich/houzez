@@ -20,6 +20,7 @@ const Navbar = () => {
 
                 <div className="nav-links">
                     <Link className="nav-link" to="/">Home</Link>
+                    {user?.is_staff && <Link className="nav-link" to="/dashboard/staff">Staff Portal</Link>}
                     {user?.role === 'OWNER' && <Link className="nav-link" to="/dashboard/owner">Owner Dashboard</Link>}
                     {user?.role === 'CUSTOMER' && <Link className="nav-link" to="/dashboard/customer">My Visits</Link>}
 

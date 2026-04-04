@@ -1,15 +1,19 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ImageSlider from './ImageSlider';
 import { getDirectionsUrl } from '../utils/maps';
 
 const prettyType = (rawType = '') => rawType.replace('_', ' ');
 
 const PropertyCard = ({ property }) => {
+	const navigate = useNavigate();
 	const directionsUrl = getDirectionsUrl(property);
 
 	return (
 		<article className="card property-card">
-			<ImageSlider images={property.media || property.images} />
+			<ImageSlider
+				images={property.media || property.images}
+				onMediaClick={() => navigate(`/property/${property.id}`)}
+			/>
 			<div className="property-body">
 				<h3>{property.title}</h3>
 				<p className="property-meta">📍 {property.location}</p>

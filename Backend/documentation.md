@@ -77,6 +77,10 @@ PUT/PATCH /api/properties/<id>/: Update a property. (Requires Auth + Owner Role 
 
 DELETE /api/properties/<id>/: Remove a property listing.
 
+GET /api/staff-portal/: Staff-only dashboard summary and recent properties.
+
+Server admin promotion script: python makeadmin.py <username> (sets is_staff=True for the chosen user).
+
 Bookings/Visits
 
 POST /api/bookings/: Book a house visit. (Requires Auth + Customer Role).

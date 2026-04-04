@@ -18,18 +18,22 @@ class IsOwnerWriteOrReadOnly(permissions.BasePermission):
             logger.warning('Permission denied: unauthenticated write attempt method=%s path=%s', request.method, request.path)
             return False
         is_owner = getattr(request.user, 'role', '') == 'OWNER'
-        if not is_owner:
+        is_staff = bool(getattr(request.user, 'is_staff', False))
+        if not (is_owner or is_staff):
             logger.warning(
-                'Permission denied: non-owner write attempt user_id=%s role=%s method=%s path=%s',
+                'Permission denied: non-owner write attempt user_id=%s role=%s is_staff=%s method=%s path=%s',
                 request.user.id,
                 getattr(request.user, 'role', ''),
+                getattr(request.user, 'is_staff', False),
                 request.method,
                 request.path,
             )
-        return is_owner
+        return is_owner or is_staff
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user and request.user.is_authenticated and getattr(request.user, 'is_staff', False):
             return True
         allowed = bool(request.user and request.user.is_authenticated and obj.owner_id == request.user.id)
         if not allowed:

@@ -284,6 +284,10 @@ h1 {
   display: block;
 }
 
+.slider-media-clickable {
+  cursor: pointer;
+}
+
 .slider-arrow {
   position: absolute;
   top: 50%;
@@ -397,6 +401,14 @@ h1 {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.4rem;
+}
+
+.dashboard-panel h3 {
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-panel .property-meta {
+  margin-top: 0.35rem;
 }
 
 .auth-card h2,

@@ -1,11 +1,18 @@
+from django.contrib.auth import get_user_model
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from rentals.models import Booking, Property
 from rentals.serializers import PropertySerializer
 
+from .serializers import StaffUserSerializer
 from .permissions import IsStaffMember
+
+
+User = get_user_model()
 
 
 class StaffPortalView(APIView):
@@ -27,3 +34,14 @@ class StaffPortalView(APIView):
             'stats': stats,
             'recent_properties': recent_properties,
         })
+
+
+class StaffUserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated, IsStaffMember]
+    serializer_class = StaffUserSerializer
+    queryset = User.objects.all().order_by('-date_joined')
+
+    def perform_destroy(self, instance):
+        if self.request.user.id == instance.id:
+            raise ValidationError('You cannot delete your own staff account while signed in.')
+        instance.delete()

@@ -57,3 +57,43 @@ class StaffPortalTests(APITestCase):
         response = self.client.delete(f'/api/properties/{self.property.id}/')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Property.objects.filter(id=self.property.id).exists())
+
+
+class StaffUserManagementTests(APITestCase):
+    def setUp(self):
+        self.staff = User.objects.create_user(
+            username='staff1',
+            email='staff1@example.com',
+            password='testpass123',
+            role='OWNER',
+            is_staff=True,
+        )
+        self.customer = User.objects.create_user(
+            username='customer1',
+            email='customer1@example.com',
+            password='testpass123',
+            role='CUSTOMER',
+        )
+
+    def test_staff_can_list_users(self):
+        self.client.force_authenticate(user=self.staff)  # type: ignore[attr-defined]
+        response = self.client.get('/api/staff-users/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertGreaterEqual(len(response.data), 2)
+
+    def test_staff_can_update_permissions(self):
+        self.client.force_authenticate(user=self.staff)  # type: ignore[attr-defined]
+        response = self.client.patch(
+            f'/api/staff-users/{self.customer.id}/',
+            {'is_staff': True, 'role': 'OWNER'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.customer.refresh_from_db()
+        self.assertTrue(self.customer.is_staff)
+        self.assertEqual(self.customer.role, 'OWNER')
+
+    def test_staff_cannot_delete_self(self):
+        self.client.force_authenticate(user=self.staff)  # type: ignore[attr-defined]
+        response = self.client.delete(f'/api/staff-users/{self.staff.id}/')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

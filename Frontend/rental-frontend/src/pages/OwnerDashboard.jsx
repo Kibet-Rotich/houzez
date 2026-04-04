@@ -18,6 +18,7 @@ const OwnerDashboard = ({ scope = 'owner' }) => {
     const isStaffPortal = scope === 'staff';
     const [properties, setProperties] = useState([]);
     const [bookings, setBookings] = useState([]);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [portalStats, setPortalStats] = useState(null);
     const [recentProperties, setRecentProperties] = useState([]);
@@ -31,6 +32,7 @@ const OwnerDashboard = ({ scope = 'owner' }) => {
     const [editFiles, setEditFiles] = useState([]);
     const [replaceMedia, setReplaceMedia] = useState(false);
     const [editMessage, setEditMessage] = useState('');
+    const [userMessage, setUserMessage] = useState('');
 
     const fetchData = useCallback(async () => {
         try {
@@ -44,11 +46,14 @@ const OwnerDashboard = ({ scope = 'owner' }) => {
                 setPortalStats(portalRes.data.stats || null);
                 setRecentProperties(portalRes.data.recent_properties || []);
                 setBookings([]);
+                const userRes = await api.get('staff-users/');
+                setUsers(userRes.data.results || userRes.data);
             } else {
                 const bookRes = await api.get('bookings/');
                 setBookings(bookRes.data.results || bookRes.data);
                 setPortalStats(null);
                 setRecentProperties([]);
+                setUsers([]);
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
@@ -154,6 +159,38 @@ const OwnerDashboard = ({ scope = 'owner' }) => {
         setEditFiles([]);
         setReplaceMedia(false);
         setEditMessage('');
+    };
+
+    const handleUserChange = async (userId, updates) => {
+        setUserMessage('');
+
+        try {
+            await api.patch(`staff-users/${userId}/`, updates);
+            setUserMessage('User permissions updated.');
+            fetchData();
+        } catch (error) {
+            console.error('Error updating user:', error.response?.data || error.message);
+            setUserMessage('Failed to update user permissions.');
+        }
+    };
+
+    const handleDeleteUser = async (userId) => {
+        if (String(userId) === String(user.user_id)) {
+            setUserMessage('You cannot delete your own staff account while signed in.');
+            return;
+        }
+
+        const confirmed = window.confirm('Delete this user account? Their owned properties will also be deleted because ownership still cascades.');
+        if (!confirmed) return;
+
+        try {
+            await api.delete(`staff-users/${userId}/`);
+            setUserMessage('User deleted successfully.');
+            fetchData();
+        } catch (error) {
+            console.error('Error deleting user:', error.response?.data || error.message);
+            setUserMessage('Failed to delete user.');
+        }
     };
 
     const handleEditInputChange = (e) => {
@@ -281,6 +318,53 @@ const OwnerDashboard = ({ scope = 'owner' }) => {
                         <h3>{portalStats.pending_bookings}</h3>
                         <p className="property-meta">Pending bookings</p>
                     </article>
+                </section>
+            )}
+
+            {isStaffPortal && (
+                <section className="dashboard-panel">
+                    <h3>User Management</h3>
+                    <p className="property-meta">Manage who can log in, who gets staff access, and remove accounts when needed.</p>
+                    {userMessage && <p className="message" style={{ marginTop: '0.75rem' }}>{userMessage}</p>}
+
+                    <div className="grid" style={{ marginTop: '0.85rem' }}>
+                        {users.map((account) => (
+                            <article key={account.id} className="card" style={{ padding: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                                    <div>
+                                        <h4>{account.username}</h4>
+                                        <p className="property-meta">{account.email || 'No email set'}</p>
+                                        <p className="property-meta">Role: {account.role} · Staff: {account.is_staff ? 'Yes' : 'No'} · Active: {account.is_active ? 'Yes' : 'No'}</p>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'start' }}>
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline"
+                                            onClick={() => handleUserChange(account.id, { is_staff: !account.is_staff })}
+                                        >
+                                            {account.is_staff ? 'Remove Staff' : 'Make Staff'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline"
+                                            onClick={() => handleUserChange(account.id, { is_active: !account.is_active })}
+                                        >
+                                            {account.is_active ? 'Deactivate' : 'Activate'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary"
+                                            onClick={() => handleDeleteUser(account.id)}
+                                            disabled={String(account.id) === String(user.user_id)}
+                                            style={{ opacity: String(account.id) === String(user.user_id) ? 0.65 : 1 }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
                 </section>
             )}
 

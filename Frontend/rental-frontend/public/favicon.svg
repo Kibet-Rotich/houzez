@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 48 48">
   <!-- House Icon for OneGB -->
-  <path fill="#183153" d="M24 4L4 18v22h8v-12h16v12h8V18L24 4z"/>
-  <rect fill="#183153" x="10" y="20" width="4" height="4"/>
-  <rect fill="#183153" x="18" y="20" width="4" height="4"/>
-  <rect fill="#183153" x="26" y="20" width="4" height="4"/>
-  <rect fill="#183153" x="34" y="20" width="4" height="4"/>
+  <path fill="#5B7290" d="M24 4L4 18v22h8v-12h16v12h8V18L24 4z"/>
+  <rect fill="#5B7290" x="10" y="20" width="4" height="4"/>
+  <rect fill="#5B7290" x="18" y="20" width="4" height="4"/>
+  <rect fill="#5B7290" x="26" y="20" width="4" height="4"/>
+  <rect fill="#5B7290" x="34" y="20" width="4" height="4"/>
   <rect fill="#b99156" x="20" y="28" width="8" height="8"/>
 </svg>

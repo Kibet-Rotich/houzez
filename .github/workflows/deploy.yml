@@ -35,8 +35,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./Frontend/rental-frontend/dist/ 
           server-dir: public_html/
-          exclude: |
-            .htaccess
 
       # --- DEPLOY BACKEND & RESTART ---
       - name: Deploy Backend via FTP

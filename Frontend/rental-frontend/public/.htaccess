@@ -1,0 +1,14 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Keep existing files and folders untouched.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Do not rewrite backend API/proxy paths.
+  RewriteRule ^backend(/|$) - [L]
+
+  # SPA fallback: route all other requests to React entry point.
+  RewriteRule ^ index.html [L]
+</IfModule>

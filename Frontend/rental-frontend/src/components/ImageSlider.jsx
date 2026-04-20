@@ -20,10 +20,22 @@ const ImageSlider = ({ images, className = '', onMediaClick }) => {
         setCurrentIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1);
     };
 
+    // Helper to get full media URL from media object
+    const getMediaUrl = (media) => {
+        if (!media) return '';
+        return (media.url || media.image || '').startsWith('http')
+            ? (media.url || media.image)
+            : `${BASE_URL}${media.url || media.image}`;
+    };
+
+    // Calculate indices for preloading adjacent images
+    const nextIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
+    const prevIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
+
     const currentMedia = images[currentIndex];
-    const mediaUrl = (currentMedia.url || currentMedia.image || '').startsWith('http')
-        ? (currentMedia.url || currentMedia.image)
-        : `${BASE_URL}${currentMedia.url || currentMedia.image}`;
+    const mediaUrl = getMediaUrl(currentMedia);
+    const nextMediaUrl = getMediaUrl(images[nextIndex]);
+    const prevMediaUrl = getMediaUrl(images[prevIndex]);
     const isVideo = currentMedia.media_type === 'VIDEO';
 
     const handleMediaClick = () => {
@@ -37,6 +49,12 @@ const ImageSlider = ({ images, className = '', onMediaClick }) => {
     return (
         <>
             <div className={`slider ${className}`.trim()}>
+                {/* INVISIBLE PRELOADER: Forces browser to download next/prev images in advance */}
+                <div style={{ display: 'none' }}>
+                    {images.length > 1 && <img src={nextMediaUrl} alt="preload next" />}
+                    {images.length > 1 && <img src={prevMediaUrl} alt="preload prev" />}
+                </div>
+
                 {images.length > 1 && (
                     <>
                         <button className="slider-arrow left" onClick={goToPrevious}>❮</button>

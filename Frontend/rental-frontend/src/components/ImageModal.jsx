@@ -35,9 +35,10 @@ const ImageModal = ({ isOpen, mediaUrl, mediaType, onClose, images, currentIndex
     if (!isOpen) return null;
 
     const currentMedia = images[index];
-    const currentMediaUrl = (currentMedia.url || currentMedia.image || '').startsWith('http')
-        ? (currentMedia.url || currentMedia.image)
-        : `${BASE_URL}${currentMedia.url || currentMedia.image}`;
+    const fullMediaUrl = currentMedia.full_url || currentMedia.url || currentMedia.image || '';
+    const currentMediaUrl = fullMediaUrl.startsWith('http')
+        ? fullMediaUrl
+        : `${BASE_URL}${fullMediaUrl}`;
     const isVideo = currentMedia.media_type === 'VIDEO';
 
     return (

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BASE_URL } from '../config';
 import ImageModal from './ImageModal';
 
-const ImageSlider = ({ images, className = '', onMediaClick }) => {
+const ImageSlider = ({ images, className = '', onMediaClick, preferThumbnail = false }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -20,12 +20,13 @@ const ImageSlider = ({ images, className = '', onMediaClick }) => {
         setCurrentIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1);
     };
 
-    // Helper to get full media URL from media object
-    const getMediaUrl = (media) => {
+    // Resolve media URL from either the thumbnail or full source.
+    const getMediaUrl = (media, useThumbnail = false) => {
         if (!media) return '';
-        return (media.url || media.image || '').startsWith('http')
-            ? (media.url || media.image)
-            : `${BASE_URL}${media.url || media.image}`;
+        const rawUrl = useThumbnail
+            ? (media.thumbnail_url || media.full_url || media.url || media.image || '')
+            : (media.full_url || media.url || media.image || '');
+        return rawUrl.startsWith('http') ? rawUrl : `${BASE_URL}${rawUrl}`;
     };
 
     // Calculate indices for preloading adjacent images
@@ -33,9 +34,9 @@ const ImageSlider = ({ images, className = '', onMediaClick }) => {
     const prevIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
 
     const currentMedia = images[currentIndex];
-    const mediaUrl = getMediaUrl(currentMedia);
-    const nextMediaUrl = getMediaUrl(images[nextIndex]);
-    const prevMediaUrl = getMediaUrl(images[prevIndex]);
+    const mediaUrl = getMediaUrl(currentMedia, preferThumbnail);
+    const nextMediaUrl = getMediaUrl(images[nextIndex], preferThumbnail);
+    const prevMediaUrl = getMediaUrl(images[prevIndex], preferThumbnail);
     const isVideo = currentMedia.media_type === 'VIDEO';
 
     const handleMediaClick = () => {

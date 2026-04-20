@@ -12,6 +12,7 @@ const PropertyCard = ({ property }) => {
 		<article className="card property-card">
 			<ImageSlider
 				images={property.media || property.images}
+				preferThumbnail
 				onMediaClick={() => navigate(`/property/${property.id}`)}
 			/>
 			<div className="property-body">

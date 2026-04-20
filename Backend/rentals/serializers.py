@@ -11,16 +11,24 @@ class PropertyMediaSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
     # Keep `image` key for backward compatibility with existing frontend components.
     image = serializers.SerializerMethodField()
+    full_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
 
     class Meta:
         model = PropertyImage
-        fields = ['id', 'media_type', 'url', 'image', 'created_at']
+        fields = ['id', 'media_type', 'url', 'image', 'full_url', 'thumbnail_url', 'created_at']
 
     def get_url(self, obj):
         return obj.file_url
 
     def get_image(self, obj):
         return obj.file_url
+
+    def get_full_url(self, obj):
+        return obj.full_url
+
+    def get_thumbnail_url(self, obj):
+        return obj.thumbnail_url
 
 
 class PropertySerializer(serializers.ModelSerializer):

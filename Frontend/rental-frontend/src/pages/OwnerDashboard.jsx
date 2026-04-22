@@ -340,6 +340,13 @@ const OwnerDashboard = ({ scope = 'owner' }) => {
                                         <button
                                             type="button"
                                             className="btn btn-outline"
+                                            onClick={() => handleUserChange(account.id, { role: account.role === 'CUSTOMER' ? 'OWNER' : 'CUSTOMER' })}
+                                        >
+                                            {account.role === 'CUSTOMER' ? 'Make Owner' : 'Make Customer'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline"
                                             onClick={() => handleUserChange(account.id, { is_staff: !account.is_staff })}
                                         >
                                             {account.is_staff ? 'Remove Staff' : 'Make Staff'}

@@ -5,6 +5,7 @@ import sys
 
 import django
 
+#small change to allow repush
 
 def main() -> int:
     if len(sys.argv) != 2:

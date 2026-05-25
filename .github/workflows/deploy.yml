@@ -35,6 +35,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./Frontend/rental-frontend/dist/ 
           server-dir: public_html/
+          exclude: |
+            media/**
+            .htaccess
+            cgi-bin/**
 
       # --- DEPLOY BACKEND & RESTART ---
       - name: Deploy Backend via FTP
@@ -45,9 +49,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./Backend/
           server-dir: django_backend/
-          # Ensure tmp/restart.txt is NOT excluded
           exclude: |
             **/venv/**
             **/__pycache__/**
-            db.sqlite3
-            media/
+            tmp/restart.txt
